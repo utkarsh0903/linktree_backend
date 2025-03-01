@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/utkarsh0903/linktree_backend.git"
+  },
+  "author": "Utkarsh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/utkarsh0903/linktree_backend/issues"
+  },
+  "homepage": "https://github.com/utkarsh0903/linktree_backend#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.11.0",
+    "nodemon": "^3.1.9"
+  }
+}
