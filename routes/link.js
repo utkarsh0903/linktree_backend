@@ -1,13 +1,7 @@
 const express = require("express");
 const Link = require("../models/link.models");
-// const bcrypt = require("bcrypt");
 const router = express.Router();
-// const dotenv = require("dotenv");
-// const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middlewares/auth");
-// const emailValid = require("../middlewares/emailValid");
-// dotenv.config();
-// const secretKey = process.env.JWT_Secret;
 
 router.post("/add-links", authMiddleware, async (req, res) => {
   try {
@@ -67,9 +61,12 @@ router.put("/:id/click", async (req, res) => {
     const usertype = req.headers["user-agent"];
 
     const getDeviceType = (usertype) => {
-      if (/mobile/i.test(usertype)) return "Mobile";
-      if (/tablet/i.test(usertype)) return "Tablet";
-      return "Desktop";
+      if (/windows/i.test(usertype)) return "Windows";
+      if (/mac/i.test(usertype)) return "Mac";
+      if (/linux/i.test(usertype)) return "Linux";
+      if (/android/i.test(usertype)) return "Android";
+      if (/iphone|ipad|ipod/i.test(usertype)) return "iOS";
+      return "Other";
     };
 
     const deviceType = getDeviceType(usertype);
