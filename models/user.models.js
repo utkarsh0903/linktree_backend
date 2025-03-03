@@ -7,9 +7,17 @@ const userSchema = new mongoose.Schema({
   },
   lastname: String,
   category: String,
+  bio: {
+    type: String,
+    default: "Bio"
+  },
   username: {
     type: String,
     unique: [true, "Username should be unique"],
+  },
+  bannerBackground: {
+    type: String,
+    default: "#342B26"
   },
   email: {
     type: String,

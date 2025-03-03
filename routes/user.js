@@ -9,18 +9,31 @@ const emailValid = require("../middlewares/emailValid");
 dotenv.config();
 const secretKey = process.env.JWT_Secret;
 
-// router.get("/", authMiddleware, async (req, res) => {
-//   const userId = req.user.id;
-//   try {
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(400).json({ message: "User not found" });
-//     }
-//     return res.status(200).json(user);
-//   } catch (error) {
-//     return res.status(500).json({ message: error.message });
-//   }
-// });
+router.get("/", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  const {id} = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
 
 router.post("/register", async (req, res) => {
   const { firstname, lastname, email, password, confirmPassword } = req.body;
@@ -89,12 +102,10 @@ router.post("/login", async (req, res) => {
   }
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) {
-    return res
-      .status(400)
-      .json({
-        message: "The password you entered is incorrect",
-        errorType: "password",
-      });
+    return res.status(400).json({
+      message: "The password you entered is incorrect",
+      errorType: "password",
+    });
   }
   try {
     const payload = {
@@ -110,7 +121,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/username", authMiddleware, async (req, res) => {
-  const {username} = req.body;
+  const { username } = req.body;
   const userId = req.user.id;
   console.log(req.body);
 
@@ -131,6 +142,28 @@ router.post("/username", authMiddleware, async (req, res) => {
     user.username = username;
     await user.save();
     return res.status(200).json({ message: "Username added successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+router.put("/update-profile", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  const { bio, username, bannerBackground } = req.body;
+
+  const isUserExist = await User.findById(userId);
+  if (!isUserExist) {
+    return res.status(400).json({ message: "User does not exist" });
+  }
+  try {
+    if (bio) isUserExist.bio = bio;
+    if (username) isUserExist.username = username;
+    if (bannerBackground) isUserExist.bannerBackground = bannerBackground;
+
+    // Save the updated user data
+    await isUserExist.save();
+
+    return res.status(200).json({ message: "User updated successfully", isUserExist });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
