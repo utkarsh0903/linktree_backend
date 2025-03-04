@@ -138,7 +138,9 @@ router.post("/username", authMiddleware, async (req, res) => {
   const userId = req.user.id;
 
   if (!username) {
-    return res.status(400).json({ message: "Username required*", errorType: "username" });
+    return res
+      .status(400)
+      .json({ message: "Username required*", errorType: "username" });
   }
 
   try {
@@ -148,7 +150,9 @@ router.post("/username", authMiddleware, async (req, res) => {
     }
     const isUsernameExist = await User.findOne({ username });
     if (isUsernameExist && isUsernameExist._id.toString() !== userId) {
-      return res.status(400).json({ message: "Username already taken", errorType: "username" });
+      return res
+        .status(400)
+        .json({ message: "Username already taken", errorType: "username" });
     }
 
     user.username = username;
@@ -194,11 +198,15 @@ router.put("/update-user-info", authMiddleware, async (req, res) => {
   try {
     if (email) {
       if (!emailValid(email)) {
-        return res.status(400).json({ message: "Invalid email", errorType: "email" });
+        return res
+          .status(400)
+          .json({ message: "Invalid email", errorType: "email" });
       }
       const isEmailExist = await User.findOne({ email });
       if (isEmailExist) {
-        return res.status(400).json({ message: "Email already exist", errorType: "email" });
+        return res
+          .status(400)
+          .json({ message: "Email already exist", errorType: "email" });
       }
       isUserExist.email = email;
     }
