@@ -79,7 +79,7 @@ router.post("/register", async (req, res) => {
   if (!passwordCheck.test(password)) {
     return res.status(400).json({
       message:
-        "Please choose a strong password that is at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character(!@#$%^&*).",
+        "Please choose a strong password that is at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character (!@#$%^&*).",
       errorType: "password",
     });
   }
@@ -136,10 +136,9 @@ router.post("/login", async (req, res) => {
 router.post("/username", authMiddleware, async (req, res) => {
   const { username } = req.body;
   const userId = req.user.id;
-  console.log(req.body);
 
   if (!username) {
-    return res.status(400).json({ message: "Username required*" });
+    return res.status(400).json({ message: "Username required*", errorType: "username" });
   }
 
   try {
@@ -149,7 +148,7 @@ router.post("/username", authMiddleware, async (req, res) => {
     }
     const isUsernameExist = await User.findOne({ username });
     if (isUsernameExist && isUsernameExist._id.toString() !== userId) {
-      return res.status(400).json({ message: "Username already taken" });
+      return res.status(400).json({ message: "Username already taken", errorType: "username" });
     }
 
     user.username = username;
