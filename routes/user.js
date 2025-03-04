@@ -23,7 +23,7 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   try {
     const user = await User.findById(id);
     if (!user) {
@@ -43,12 +43,36 @@ router.post("/register", async (req, res) => {
       .status(400)
       .json({ message: "First name required*", errorType: "firstname" });
   }
+  if (!lastname) {
+    return res
+      .status(400)
+      .json({ message: "Last name required*", errorType: "lastname" });
+  }
+
+  if (!email) {
+    return res
+      .status(400)
+      .json({ message: "Please enter email*", errorType: "email" });
+  }
+
+  if (!emailValid(email)) {
+    return res.status(400).json({
+      message: "Invalid email format, ex: u@g.com",
+      errorType: "email",
+    });
+  }
 
   if (!password) {
     return res
       .status(400)
       .json({ message: "Please enter your password*", errorType: "password" });
   }
+
+  const isUserExist = await User.findOne({ email });
+  if (isUserExist) {
+    return res.status(400).json({ message: "User already exist" });
+  }
+
   const passwordCheck =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -60,17 +84,6 @@ router.post("/register", async (req, res) => {
     });
   }
 
-  if (!emailValid(email)) {
-    return res.status(400).json({
-      message: "Invalid email format, ex: u@g.com",
-      errorType: "email",
-    });
-  }
-
-  const isUserExist = await User.findOne({ email });
-  if (isUserExist) {
-    return res.status(400).json({ message: "User already exist" });
-  }
   if (password !== confirmPassword) {
     return res.status(400).json({
       message: "Password did not match",
@@ -163,41 +176,54 @@ router.put("/update-profile", authMiddleware, async (req, res) => {
     // Save the updated user data
     await isUserExist.save();
 
-    return res.status(200).json({ message: "User updated successfully", isUserExist });
+    return res
+      .status(200)
+      .json({ message: "User updated successfully", isUserExist });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 });
 
-// router.put("/update", authMiddleware, async (req, res) => {
-//   const userId = req.user.id;
-//   const { email, username, mobile } = req.body;
+router.put("/update-user-info", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  const { firstname, lastname, email, password } = req.body;
 
-//   const isUserExist = await User.findById(userId);
-//   if (!isUserExist) {
-//     return res.status(400).json({ message: "User does not exist" });
-//   }
-//   try {
-//     if (email) {
-//       if (!emailValid(email)) {
-//         return res
-//           .status(400)
-//           .json({ message: "Invalid email format, ex: u@g.com" });
-//       }
-//       const isEmailExist = await User.findOne({ email });
-//       if (isEmailExist) {
-//         return res.status(400).json({ message: "Email already exist" });
-//       }
-//       isUserExist.email = email;
-//     }
-//     if (mobile) isUserExist.mobile = mobile;
-//     if (username) isUserExist.username = username;
-//     await isUserExist.save();
-//     return res.status(200).json({ message: "User updated successfully" });
-//   } catch (error) {
-//     return res.status(500).json({ message: error.message });
-//   }
-// });
+  const isUserExist = await User.findById(userId);
+  if (!isUserExist) {
+    return res.status(400).json({ message: "User does not exist" });
+  }
+  try {
+    if (email) {
+      if (!emailValid(email)) {
+        return res.status(400).json({ message: "Invalid email", errorType: "email" });
+      }
+      const isEmailExist = await User.findOne({ email });
+      if (isEmailExist) {
+        return res.status(400).json({ message: "Email already exist", errorType: "email" });
+      }
+      isUserExist.email = email;
+    }
+    if (firstname) isUserExist.firstname = firstname;
+    if (lastname) isUserExist.lastname = lastname;
+    if (password) {
+      const passwordCheck =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+      if (!passwordCheck.test(password)) {
+        return res.status(400).json({
+          message:
+            "Please choose a strong password that is at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character(!@#$%^&*).",
+          errorType: "password",
+        });
+      }
+    }
+
+    await isUserExist.save();
+    return res.status(200).json({ message: "User updated successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
 
 // router.delete("/delete", authMiddleware, async (req, res) => {
 //   const userId = req.user.id;
