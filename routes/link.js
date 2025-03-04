@@ -24,7 +24,7 @@ router.post("/add-links", authMiddleware, async (req, res) => {
 
     await newLink.save();
 
-    return res.status(201).json({ message: "Link added successfully!" });
+    return res.status(200).json({ message: "Link added successfully!" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
